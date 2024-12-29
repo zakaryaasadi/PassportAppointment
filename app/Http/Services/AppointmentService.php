@@ -143,9 +143,9 @@ class AppointmentService{
     public function generate($id)
     {
         $path = public_path(DefaultValue::PathDir. $id . '.png');
-        QrCode::format('png')->size(300)->generate(URL::to('/qr/details/'. $id), $path);
+        QrCode::format('png')->size(300)->generate(secure_url('/qr/details/'. $id), $path);
 
-        return asset(URL::to('/qrcodes/'. $id . '.png'));
+        return secure_asset(URL::to('/qrcodes/'. $id . '.png'));
     }
 
 
