@@ -40,13 +40,10 @@ class AppointmentService{
         if($appointments->count() > 0){
 
             $firstAppointment = $appointments->first();
-            return new ResponseModel(ResponseStatusEnum::Pending , "You cannot create a new task because there is still a pending task", [
-                "id" => $firstAppointment->id,
-                "name" => $firstAppointment->name,
-                "date" => Carbon::parse($firstAppointment->start_appointment_date)->format("Y-m-d"),
-                "from" => Carbon::parse($firstAppointment->start_appointment_date)->format("H:i"),
-                "to" => Carbon::parse($firstAppointment->end_appointment_date)->format("H:i"),
-            ]);
+            return new ResponseModel(ResponseStatusEnum::Pending , 
+                                    "You cannot create a new task because there is still a pending task",
+                                    $this->addNewProperties($firstAppointment)
+                                );
         }
 
         // End check...
@@ -142,10 +139,11 @@ class AppointmentService{
 
     public function generate($id)
     {
-        $path = public_path(DefaultValue::PathDir. $id . '.png');
+        $pathfile = DefaultValue::PathDir . $id . '.png';
+        $path = public_path($pathfile);
         QrCode::format('png')->size(300)->generate(secure_url('/qr/details/'. $id), $path);
 
-        return secure_asset(URL::to('/qrcodes/'. $id . '.png'));
+        return secure_asset(URL::to('/' . $pathfile));
     }
 
 

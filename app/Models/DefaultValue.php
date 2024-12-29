@@ -11,5 +11,5 @@ class DefaultValue
     const NumberOfHourParts = 2;
     const StartWorkHour = 8;
     const EndWorkHour = 15;
-    const PathDir = "qrcodes\\";
+    const PathDir = "qrcodes/";
 }
