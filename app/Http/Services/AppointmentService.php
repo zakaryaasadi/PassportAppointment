@@ -50,27 +50,35 @@ class AppointmentService{
 
 
         $clientsPerHour = DefaultValue::ClientsPerDay / DefaultValue::NumberOfWorkHours;
+
+        $tomorrow = Carbon::now()->addDay()->setTime(DefaultValue::StartWorkHour, 0, 0);
         
-        $this->initDate(Carbon::now()->addDay()->setTime(DefaultValue::StartWorkHour, 0, 0));
+        $this->initDate($tomorrow);
 
-        $lastAppointment = Appointment::where("type", "=", $type)->latest()->first();
+        $lastAppointment = Appointment::where("type", "=", $type)
+                                        ->latest()
+                                        ->first();
         if($lastAppointment){
-            
-            $this->startAppointmentDate = Carbon::parse($lastAppointment->start_appointment_date);
-            $this->endAppointmentDate = Carbon::parse($lastAppointment->end_appointment_date);
 
-            $clientCountPerHourPart = Appointment::where("start_appointment_date", "=", $lastAppointment->start_appointment_date)->count();
-            if($clientCountPerHourPart >= $clientsPerHour / DefaultValue::NumberOfHourParts){
-                $this->startAppointmentDate = Carbon::parse($lastAppointment->end_appointment_date);
-                $this->endAppointmentDate = Carbon::parse($lastAppointment->end_appointment_date)
-                                                ->addMinutes( 60 / DefaultValue::NumberOfHourParts);
+            $lastAppointmentDate = Carbon::parse($lastAppointment->start_appointment_date);
 
-                if ($this->startAppointmentDate->hour >= DefaultValue::EndWorkHour) {
-                    // If the time is 3 PM or later, move the date to tomorrow
-                    $this->initDate(Carbon::parse($this->startAppointmentDate)
-                                            ->addDay()
-                                            ->settime(DefaultValue::StartWorkHour, 0, 0)
-                                        );
+            if($tomorrow <= $lastAppointmentDate){
+                $this->startAppointmentDate = Carbon::parse($lastAppointment->start_appointment_date);
+                $this->endAppointmentDate = Carbon::parse($lastAppointment->end_appointment_date);
+
+                $clientCountPerHourPart = Appointment::where("start_appointment_date", "=", $lastAppointment->start_appointment_date)->count();
+                if($clientCountPerHourPart >= $clientsPerHour / DefaultValue::NumberOfHourParts){
+                    $this->startAppointmentDate = Carbon::parse($lastAppointment->end_appointment_date);
+                    $this->endAppointmentDate = Carbon::parse($lastAppointment->end_appointment_date)
+                                                    ->addMinutes( 60 / DefaultValue::NumberOfHourParts);
+
+                    if ($this->startAppointmentDate->hour >= DefaultValue::EndWorkHour) {
+                        // If the time is 3 PM or later, move the date to tomorrow
+                        $this->initDate(Carbon::parse($this->startAppointmentDate)
+                                                ->addDay()
+                                                ->settime(DefaultValue::StartWorkHour, 0, 0)
+                                            );
+                    }
                 }
             }
 
