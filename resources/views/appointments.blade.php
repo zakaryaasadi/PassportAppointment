@@ -91,11 +91,14 @@
     $(function() {
         var today = new Date();
         var nextMonth = new Date();
+        var lastMonthe = new Date();
 
+
+        lastMonthe.setDate(today.getDate() - 30);
         nextMonth.setDate(today.getDate() + 30);
 
 
-        $('#startdate').val(today.toJSON().slice(0,10));
+        $('#startdate').val(lastMonthe.toJSON().slice(0,10));
         $('#enddate').val(nextMonth.toJSON().slice(0,10));
         
         var table = $('#table').DataTable({
